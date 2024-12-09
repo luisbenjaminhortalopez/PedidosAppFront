@@ -19,7 +19,7 @@ class MainApp extends StatelessWidget {
           //bodyText2: TextStyle(fontSize: 16.0, color: Colors.black87),
         ),
       ),
-      home:  PedidosScreen(),
+      home:  const PedidosScreen(),
     );
   }
 }
