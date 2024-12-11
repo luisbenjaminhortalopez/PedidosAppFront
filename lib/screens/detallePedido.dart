@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
 
-class DetallePedidoScreen extends StatelessWidget {
+class DetallePedidoScreen extends StatefulWidget {
   final String customerName;
   final String customerAddress;
   final String customerMail;
@@ -11,6 +12,7 @@ class DetallePedidoScreen extends StatelessWidget {
   final bool isSentDeliveryMail;
   final bool deliveryStatus;
   final DateTime creationDate;
+  final String orderId;
 
   const DetallePedidoScreen({
     super.key,
@@ -23,11 +25,66 @@ class DetallePedidoScreen extends StatelessWidget {
     required this.isSentDeliveryMail,
     required this.deliveryStatus,
     required this.creationDate,
+    required this.orderId,
   });
 
   @override
+  State<DetallePedidoScreen> createState() => _DetallePedidoScreenState();
+}
+
+class _DetallePedidoScreenState extends State<DetallePedidoScreen> {
+  bool _isUpdating = false;
+  late bool _currentDeliveryStatus;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentDeliveryStatus = widget.deliveryStatus;
+  }
+
+  Future<void> _markAsDelivered() async {
+    setState(() {
+      _isUpdating = true;
+    });
+
+    final url = 'http://localhost:3001/api/orders/delivered/${widget.orderId}';
+    try {
+      final response = await http.put(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        setState(() {
+          _currentDeliveryStatus = true;
+          _isUpdating = false;
+        });
+
+        Navigator.pop(context, {'id': widget.orderId, 'deliveryStatus': _currentDeliveryStatus});
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('El pedido ha sido marcado como entregado.'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        throw Exception('Error al marcar el pedido como entregado.');
+      }
+    } catch (e) {
+      setState(() {
+        _isUpdating = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final String formattedDate = DateFormat('dd/MM/yyyy HH:mm').format(creationDate);
+    final String formattedDate =
+        DateFormat('dd/MM/yyyy HH:mm').format(widget.creationDate);
 
     return Scaffold(
       appBar: AppBar(
@@ -53,7 +110,7 @@ class DetallePedidoScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Cliente: $customerName',
+                      'Cliente: ${widget.customerName}',
                       style: const TextStyle(
                         fontSize: 20.0,
                         fontWeight: FontWeight.bold,
@@ -62,7 +119,7 @@ class DetallePedidoScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 16.0),
                     Text(
-                      'Dirección: $customerAddress',
+                      'Dirección: ${widget.customerAddress}',
                       style: const TextStyle(
                         fontSize: 16.0,
                         color: Colors.white,
@@ -70,15 +127,7 @@ class DetallePedidoScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 8.0),
                     Text(
-                      'Correo: $customerMail',
-                      style: const TextStyle(
-                        fontSize: 16.0,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(height: 8.0),
-                    Text(
-                      'Coordenadas: Latitud $lat, Longitud $lng',
+                      'Correo: ${widget.customerMail}',
                       style: const TextStyle(
                         fontSize: 16.0,
                         color: Colors.white,
@@ -92,33 +141,33 @@ class DetallePedidoScreen extends StatelessWidget {
                         color: Colors.white,
                       ),
                     ),
-                    const SizedBox(height: 16.0),
-                    Text(
-                      'Correo de confirmación enviado: ${isSentMailOrder ? "Sí" : "No"}',
-                      style: const TextStyle(
-                        fontSize: 16.0,
-                        color: Colors.white,
-                      ),
-                    ),
                     const SizedBox(height: 8.0),
                     Text(
-                      'Correo de entrega enviado: ${isSentDeliveryMail ? "Sí" : "No"}',
-                      style: const TextStyle(
-                        fontSize: 16.0,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(height: 16.0),
-                    Text(
-                      'Estado del pedido: ${deliveryStatus ? "Entregado" : "No entregado"}',
+                      'Estado del pedido: ${_currentDeliveryStatus ? "Entregado" : "No entregado"}',
                       style: TextStyle(
                         fontSize: 18.0,
                         fontWeight: FontWeight.bold,
-                        color: deliveryStatus
+                        color: _currentDeliveryStatus
                             ? const Color(0xFF21BF73) // Verde para entregado
                             : const Color(0xFFFF4C29), // Rojo para no entregado
                       ),
                     ),
+                    const SizedBox(height: 24.0),
+                    _isUpdating
+                        ? const Center(child: CircularProgressIndicator())
+                        : ElevatedButton(
+                            onPressed: _currentDeliveryStatus ? null : _markAsDelivered,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF21BF73),
+                              padding: const EdgeInsets.symmetric(vertical: 12.0),
+                            ),
+                            child: Text(
+                              _currentDeliveryStatus
+                                  ? 'Pedido Entregado'
+                                  : 'Marcar como Entregado',
+                              style: const TextStyle(fontSize: 16.0),
+                            ),
+                          ),
                   ],
                 ),
               ),

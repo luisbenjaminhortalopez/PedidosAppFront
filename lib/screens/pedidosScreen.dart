@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:pedidos_app/widgets/menuDrawer.dart';
-import 'detallePedido.dart'; // Asegúrate de importar la pantalla de detalles.
+import 'detallePedido.dart';
 
 class Order {
   final String id;
@@ -129,8 +129,8 @@ class _PedidosScreenState extends State<PedidosScreen> {
                                 'Status: ${order.deliveryStatus ? 'Entregado' : 'No entregado'}',
                                 style: const TextStyle(color: Colors.white70),
                               ),
-                              onTap: () {
-                                Navigator.push(
+                              onTap: () async {
+                                final updatedOrder = await Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => DetallePedidoScreen(
@@ -143,9 +143,27 @@ class _PedidosScreenState extends State<PedidosScreen> {
                                       isSentDeliveryMail: order.isSentDeliveryMail,
                                       deliveryStatus: order.deliveryStatus,
                                       creationDate: order.creationDate,
+                                      orderId: order.id,
                                     ),
                                   ),
                                 );
+
+                                if (updatedOrder != null && updatedOrder['deliveryStatus'] != null) {
+                                  setState(() {
+                                    _orders[index] = Order(
+                                      id: order.id,
+                                      customerName: order.customerName,
+                                      deliveryStatus: updatedOrder['deliveryStatus'],
+                                      customerAddress: order.customerAddress,
+                                      customerMail: order.customerMail,
+                                      lat: order.lat,
+                                      lng: order.lng,
+                                      isSentMailOrder: order.isSentMailOrder,
+                                      isSentDeliveryMail: order.isSentDeliveryMail,
+                                      creationDate: order.creationDate,
+                                    );
+                                  });
+                                }
                               },
                             ),
                           );
