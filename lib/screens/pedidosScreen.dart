@@ -177,3 +177,5 @@ class _PedidosScreenState extends State<PedidosScreen> {
     );
   }
 }
+
+//se mejoro el diseno de las interfaces 
