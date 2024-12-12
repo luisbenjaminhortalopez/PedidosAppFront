@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:pedidos_app/widgets/menuDrawer.dart';
 import 'detallePedido.dart';
 
+//Order
 class Order {
   final String id;
   final String customerName;
