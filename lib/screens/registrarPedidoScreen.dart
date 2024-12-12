@@ -11,6 +11,7 @@ class RegistrarPedidoScreen extends StatelessWidget {
   final _formKeyCoordinates = GlobalKey<FormState>();
 
   // Controladores para los campos de texto
+  //se comenta para mejor entendimiento de los modulos de codigo 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
