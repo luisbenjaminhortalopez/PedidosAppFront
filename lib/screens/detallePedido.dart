@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 
+/** Order Detail Window */
 class DetallePedidoScreen extends StatefulWidget {
   final String customerName;
   final String customerAddress;
