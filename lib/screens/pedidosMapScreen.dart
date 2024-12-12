@@ -97,3 +97,6 @@ class _PedidosMapScreenState extends State<PedidosMapScreen> {
     );
   }
 }
+
+
+//Se coloco el metodo que acciona la camara para el uso de la aplicacion 
