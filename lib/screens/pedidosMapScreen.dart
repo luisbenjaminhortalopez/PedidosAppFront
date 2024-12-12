@@ -97,3 +97,5 @@ class _PedidosMapScreenState extends State<PedidosMapScreen> {
     );
   }
 }
+
+//Correcion del funcionamiento del action button ya que tiraba un error de sintaxis en el codigo 
