@@ -178,3 +178,4 @@ class _DetallePedidoScreenState extends State<DetallePedidoScreen> {
     );
   }
 }
+//Se coloco la implementacion y la interaccion de la api con el front en flutter 
